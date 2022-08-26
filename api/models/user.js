@@ -1,9 +1,17 @@
-"use strict";
-const { Model, DataTypes } = require("sequelize");
-var bycrypt = require('bcryptjs');
+// Define the Models
+// The User Model attributes
 
-module.exports = (sequelize) => {
-  class User extends Model {}
+"use strict";
+
+const { Model } = require("sequelize");
+const bcrypt = require("bcrypt");
+
+module.exports = (sequelize, DataTypes) => {
+  class User extends Model {
+    static associate(models) {
+      // define association here
+    }
+  }
   User.init(
     {
       firstName: {
@@ -11,10 +19,10 @@ module.exports = (sequelize) => {
         allowNull: false,
         validate: {
           notNull: {
-            msg: "Please include a name",
+            msg: "A first name is required",
           },
           notEmpty: {
-            msg: "Please enter a name",
+            msg: "Please provide a first name",
           },
         },
       },
@@ -23,10 +31,10 @@ module.exports = (sequelize) => {
         allowNull: false,
         validate: {
           notNull: {
-            msg: "Please include a last name",
+            msg: "A last name is required",
           },
           notEmpty: {
-            msg: "Please enter a last name",
+            msg: "Please provide a last name",
           },
         },
       },
@@ -35,38 +43,40 @@ module.exports = (sequelize) => {
         allowNull: false,
         validate: {
           notNull: {
-            msg: "Please include an email address",
+            msg: "An email address is required",
           },
           notEmpty: {
-            msg: "Please enter an email address",
+            msg: "Please provide a valid email address",
           },
         },
       },
       password: {
         type: DataTypes.STRING,
         allowNull: false,
-        set (val) {
+        set(val) {
           if (val) {
-            const hashedPassword = bycrypt.hashSync(val,10);
+            const hashedPassword = bcrypt.hashSync(val, 10);
             this.setDataValue("password", hashedPassword);
           }
         },
         validate: {
           notNull: {
-            msg: "Please include a password",
+            msg: "A password is required",
           },
           notEmpty: {
-            msg: "Please enter a password",
+            msg: "Please provide a passowrd",
           },
         },
       },
     },
-    { sequelize }
+    {
+      sequelize,
+    }
   );
 
   User.associate = (models) => {
     User.hasMany(models.Course, {
-      as: "user",
+      as: "User", // alias
       foreignKey: {
         fieldName: "userId",
         allowNull: false,
